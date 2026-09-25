@@ -124,9 +124,9 @@ export default async function CheckoutPage({ params, searchParams }: {
               style={{ width: '100%', marginTop: 8, padding: 12, border: '1px solid #d1d5db', borderRadius: 10 }}
             />
           </label>
-          <button className="btn primary" type="submit">Place order</button>
+          <button className="btn primary" type="submit">Place order &amp; continue to payment</button>
           <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>
-            Your order will be sent to secure Flutterwave checkout in Test Mode when it is configured.
+            Your order is created first. Payment is handled separately through Flutterwave secure checkout; you will be redirected there after you submit this form.
           </p>
         </form>
       </div>
