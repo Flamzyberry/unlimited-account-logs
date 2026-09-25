@@ -36,7 +36,10 @@ export default async function AdminPage() {
         <div className="card" style={{ marginTop: 24 }}>
           <h2>Funding & receipts</h2>
           <p>{pendingFunding ?? 0} funding request(s) currently awaiting review.</p>
-          <a className="btn primary" href="/admin/funding">Review funding & receipts</a>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <a className="btn primary" href="/admin/funding">Review funding & receipts</a>
+            <a className="btn secondary" href="/admin/manual-payment">Manual payment account</a>
+          </div>
         </div>
 
         <div className="card" style={{ marginTop: 24 }}>
