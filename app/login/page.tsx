@@ -11,6 +11,23 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState('');
+
+  async function forgotPassword(e: FormEvent) {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetMessage('');
+    setError('');
+    const supabase = createClient();
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+      redirectTo: window.location.origin + '/reset-password',
+    });
+    if (resetError) setError(resetError.message);
+    else setResetMessage('If that email is registered, a password reset link has been sent.');
+    setResetLoading(false);
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -64,6 +81,14 @@ export default function LoginPage() {
           </button>
         </form>
         {error && <p style={{ color: '#b91c1c', marginTop: 16 }}>{error}</p>}
+        <form onSubmit={forgotPassword} style={{ marginTop: 14 }}>
+          <input aria-label="Reset email" required value={resetEmail} onChange={e => setResetEmail(e.target.value)}
+            placeholder="Email for password reset" type="email" style={{ width: '100%', padding: 13, border: '1px solid #d1d5db', borderRadius: 10 }} />
+          <button className="btn secondary" type="submit" disabled={resetLoading} style={{ marginTop: 8 }}>
+            {resetLoading ? 'Sending…' : 'Forgot password?'}
+          </button>
+        </form>
+        {resetMessage && <p style={{ color: '#166534', marginTop: 12 }}>{resetMessage}</p>}
         <p style={{ marginTop: 18, fontSize: 14 }}>
           New customer? <a href="/register" style={{ color: '#4f46e5' }}>Create an account</a>
         </p>
