@@ -11,10 +11,11 @@ export default async function AdminPage() {
   const { data: profile } = await supabase.from('profiles').select('role,email,full_name').eq('id', user.id).single();
   if (profile?.role !== 'admin') redirect('/admin/login');
 
-  const [{ count: products }, { count: customers }, { count: orders }, { data: recentOrders }] = await Promise.all([
+  const [{ count: products }, { count: customers }, { count: orders }, { count: pendingFunding }, { data: recentOrders }] = await Promise.all([
     supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'customer'),
     supabase.from('orders').select('*', { count: 'exact', head: true }),
+    supabase.from('funding_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabase.from('orders').select('id,product_name,total_ngn,status,created_at,customer:profiles!orders_customer_id_fkey(full_name,email)').order('created_at', { ascending: false }).limit(8),
   ]);
 
@@ -30,6 +31,12 @@ export default async function AdminPage() {
           <div className="card"><h3>Products</h3><div className="price">{products ?? 0}</div><p>Marketplace products.</p><a className="btn secondary" href="/admin/products">Manage products</a></div>
           <div className="card"><h3>Customers</h3><div className="price">{customers ?? 0}</div><p>Registered customers.</p><a className="btn secondary" href="/admin/customers">Manage customers</a></div>
           <div className="card"><h3>Orders</h3><div className="price">{orders ?? 0}</div><p>Customer orders.</p><a className="btn secondary" href="/admin/orders">Manage orders</a></div>
+        </div>
+
+        <div className="card" style={{ marginTop: 24 }}>
+          <h2>Funding & receipts</h2>
+          <p>{pendingFunding ?? 0} funding request(s) currently awaiting review.</p>
+          <a className="btn primary" href="/admin/funding">Review funding & receipts</a>
         </div>
 
         <div className="card" style={{ marginTop: 24 }}>
