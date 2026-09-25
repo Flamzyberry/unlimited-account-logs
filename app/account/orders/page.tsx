@@ -26,12 +26,30 @@ export default async function CustomerOrders({
     .eq('customer_id', user.id)
     .order('created_at', { ascending: false });
 
-  const { placed } = await searchParams;
+  const { placed, payment } = await searchParams;
 
   return (
     <main className="container" style={{ padding: '40px 0' }}>
       <p><a href="/account">← Account</a></p>
       <h1>Order history</h1>
+
+      {payment === 'success' && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          Payment was verified successfully. Your order is now marked as paid.
+        </div>
+      )}
+
+      {payment === 'failed' && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          Payment was not completed or could not be verified. Your order remains pending.
+        </div>
+      )}
+
+      {payment === 'not-configured' && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          Flutterwave Test Mode is not configured on the server yet. Add the test secret key in Vercel, then try the order again.
+        </div>
+      )}
 
       {placed === '1' && (
         <div className="notice" style={{ marginBottom: 18 }}>
@@ -53,6 +71,11 @@ export default async function CustomerOrders({
               Quantity: {order.quantity} · Total: ₦{Number(order.total_ngn).toLocaleString()}
             </p>
             <p>Status: <strong>{order.status}</strong></p>
+            {order.status === 'pending' && (
+              <a className="btn primary" href={`/api/payments/flutterwave/create?orderId=${encodeURIComponent(order.id)}`}>
+                Pay with Flutterwave
+              </a>
+            )}
             {order.payment_reference && <p>Payment reference: {order.payment_reference}</p>}
             {order.notes && <p>Note: {order.notes}</p>}
             <small>{new Date(order.created_at).toLocaleString()}</small>
