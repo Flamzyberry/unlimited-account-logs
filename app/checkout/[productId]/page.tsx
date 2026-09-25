@@ -126,7 +126,7 @@ export default async function CheckoutPage({ params, searchParams }: {
           </label>
           <button className="btn primary" type="submit">Place order</button>
           <p style={{ color: '#6b7280', fontSize: 13, margin: 0 }}>
-            This creates a pending order. Payment processing can be connected separately.
+            Your order will be sent to secure Flutterwave checkout in Test Mode when it is configured.
           </p>
         </form>
       </div>
