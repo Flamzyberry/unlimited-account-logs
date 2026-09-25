@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const admin = createAdminClient();
 
     const { data: funding } = await admin.from('funding_requests')
-      .select('id,customer_id,amount_ngn,status,payment_reference,method')
+      .select('id,amount_ngn,status,payment_reference,method')
       .eq('payment_reference', txRef)
       .maybeSingle();
 
@@ -31,30 +31,13 @@ export async function GET(request: Request) {
       throw new Error('Funding payment did not match');
     }
 
-    const { error } = await admin.from('profiles')
-      .update({ balance_ngn: Number(funding.amount_ngn) + Number(
-        (await admin.from('profiles').select('balance_ngn').eq('id', funding.customer_id).single()).data?.balance_ngn || 0
-      ) })
-      .eq('id', funding.customer_id);
-    if (error) throw error;
-
-    const { error: txError } = await admin.from('wallet_transactions').insert({
-      customer_id: funding.customer_id,
-      amount_ngn: funding.amount_ngn,
-      type: 'credit',
-      method: 'flutterwave',
-      reference: transaction.tx_ref,
-      description: 'Flutterwave wallet funding',
-      funding_request_id: funding.id,
+    const { error } = await admin.rpc('credit_flutterwave_funding', {
+      p_request_id: funding.id,
     });
-    if (txError) throw txError;
-
-    await admin.from('funding_requests')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-      .eq('id', funding.id).eq('status', 'pending');
-
-    redirect('/account?funding=success');
+    if (error) throw error;
   } catch {
     redirect('/account?funding=failed');
   }
+
+  redirect('/account?funding=success');
 }
