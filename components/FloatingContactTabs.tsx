@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
 const links = {
-  telegram: '',
-  whatsapp: '',
-  support: '',
+  updatesGiveaway: 'https://chat.whatsapp.com/JiXHwY5UdQ7JjWsnueshwV',
+  whatsappChannel: 'https://whatsapp.com/channel/0029Vb95KOQFy72F9q2Id60m',
+  customerSupport: 'https://t.me/Unlimitedlogssupportbot',
 };
 
 function TelegramIcon() {
@@ -20,25 +20,18 @@ function SupportIcon() {
 
 export default function FloatingContactTabs() {
   const items = [
-    { label: 'Telegram Channel', href: links.telegram, className: 'telegram', icon: <TelegramIcon /> },
-    { label: 'WhatsApp Channel', href: links.whatsapp, className: 'whatsapp', icon: <WhatsAppIcon /> },
-    { label: 'Customer Support', href: links.support, className: 'support', icon: <SupportIcon /> },
+    { label: 'UPDATE & GIVEAWAY', href: links.updatesGiveaway, className: 'telegram', icon: <TelegramIcon /> },
+    { label: 'WHATSAPP CHANNEL', href: links.whatsappChannel, className: 'whatsapp', icon: <WhatsAppIcon /> },
+    { label: 'CUSTOMER SUPPORT', href: links.customerSupport, className: 'support', icon: <SupportIcon /> },
   ];
 
   return (
     <div className="floating-contact-tabs" aria-label="Contact links">
       {items.map((item) => (
-        item.href ? (
-          <Link key={item.label} href={item.href} className={`floating-contact-tab ${item.className}`} target="_blank" rel="noopener noreferrer">
-            <span className="floating-contact-icon">{item.icon}</span>
-            <span>{item.label}</span>
-          </Link>
-        ) : (
-          <span key={item.label} className={`floating-contact-tab ${item.className} floating-contact-disabled`} aria-disabled="true">
-            <span className="floating-contact-icon">{item.icon}</span>
-            <span>{item.label}</span>
-          </span>
-        )
+        <Link key={item.label} href={item.href} className={`floating-contact-tab ${item.className}`} target="_blank" rel="noopener noreferrer">
+          <span className="floating-contact-icon">{item.icon}</span>
+          <span>{item.label}</span>
+        </Link>
       ))}
     </div>
   );
