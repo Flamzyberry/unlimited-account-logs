@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 async function reviewFunding(formData: FormData) {
   'use server';
-  const supabase = await createClient();
+  const {status,customer}=await searchParams;\n  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/admin/login');
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -30,7 +30,7 @@ async function reviewFunding(formData: FormData) {
   revalidatePath('/account');
 }
 
-export default async function FundingAdmin() {
+export default async function FundingAdmin({searchParams}:{searchParams:Promise<{status?:string,customer?:string}>}) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/admin/login');
@@ -39,7 +39,7 @@ export default async function FundingAdmin() {
 
   const { data: requests } = await supabase.from('funding_requests')
     .select('id,customer_id,amount_ngn,method,status,payment_reference,receipt_path,customer_note,admin_note,created_at,customer:profiles!funding_requests_customer_id_fkey(full_name,email)')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false });\n  if(status && ['pending','approved','rejected'].includes(status)) requestQuery=requestQuery.eq('status',status);\n  if(customer) requestQuery=requestQuery.eq('customer_id',customer);\n  const { data: requests } = await requestQuery;
 
   const admin = createAdminClient();
   const withUrls = await Promise.all((requests || []).map(async (r: any) => {
@@ -54,7 +54,7 @@ export default async function FundingAdmin() {
   return (
     <main className="container" style={{ padding: '40px 0' }}>
       <p><a href="/admin">← Dashboard</a></p>
-      <h1>Funding & receipt review</h1>
+      <h1>Funding & receipt review</h1><div className="actions"><a className="btn secondary" href="/admin/funding">All</a><a className="btn secondary" href="/admin/funding?status=pending">Pending</a><a className="btn secondary" href="/admin/funding?status=approved">Approved</a><a className="btn secondary" href="/admin/funding?status=rejected">Rejected</a></div>
       <div style={{ display: 'grid', gap: 12 }}>
         {withUrls.map((r: any) => (
           <div className="card" key={r.id}>
