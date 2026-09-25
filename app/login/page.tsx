@@ -61,7 +61,9 @@ export default function LoginPage() {
       setLoading(false); return;
     }
 
-    router.replace('/account');
+    const next = searchParams.get('next');
+    const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : '/account';
+    router.replace(safeNext);
     router.refresh();
   }
 
