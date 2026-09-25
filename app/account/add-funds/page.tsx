@@ -59,6 +59,8 @@ export default async function AddFundsPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
+  const { data: manualPayment } = await supabase.from('manual_payment_settings').select('account_number,bank_name,account_name,note').eq('id', 1).maybeSingle();
+
   const { data: profile } = await supabase.from('profiles')
     .select('role,balance_ngn')
     .eq('id', user.id)
@@ -77,6 +79,17 @@ export default async function AddFundsPage({
          error === 'type' ? 'Receipt must be JPG, PNG, WEBP, or PDF.' :
          'We could not submit the funding request. Please try again.'}
       </div>}
+
+      <div className="card" style={{ marginTop: 24 }}>
+        <h2>Manual payment account</h2>
+        <p style={{ color: '#6b7280' }}>Use these details when making a manual transfer. After payment, upload your receipt below.</p>
+        <div style={{ display: 'grid', gap: 8, marginTop: 12 }}>
+          <div><strong>Account number:</strong> {manualPayment?.account_number || 'Not configured yet'}</div>
+          <div><strong>Bank:</strong> {manualPayment?.bank_name || 'Not configured yet'}</div>
+          <div><strong>Account name:</strong> {manualPayment?.account_name || 'Not configured yet'}</div>
+          {manualPayment?.note && <div><strong>Note:</strong> {manualPayment.note}</div>}
+        </div>
+      </div>
 
       <div className="grid" style={{ marginTop: 24 }}>
         <div className="card">
