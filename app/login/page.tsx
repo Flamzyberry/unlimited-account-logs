@@ -72,6 +72,8 @@ export default function LoginPage() {
       <div className="card" style={{ maxWidth: 480, margin: '0 auto' }}>
         <h1>Sign in</h1>
         {searchParams.get('registered') === '1' && <p style={{ color: '#166534' }}>Your account is ready. Sign in to continue.</p>}
+        {searchParams.get('verification') === 'success' && <p style={{ color: '#166534' }}>Email verified successfully. You can now sign in.</p>}
+        {searchParams.get('verification') === 'error' && <p style={{ color: '#b91c1c' }}>We could not complete email verification. Please request a new confirmation email.</p>}
         <p style={{ color: '#6b7280' }}>Sign in to your customer account.</p>
         <form onSubmit={submit} style={{ display: 'grid', gap: 14, marginTop: 24 }}>
           <input aria-label="Email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" type="email" style={{ padding: 13, border: '1px solid #d1d5db', borderRadius: 10 }} />
