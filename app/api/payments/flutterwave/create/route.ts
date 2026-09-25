@@ -35,8 +35,9 @@ export async function GET(request: Request) {
     redirect('/admin/login');
   }
 
+  let paymentUrl: string;
   try {
-    const paymentUrl = await createFlutterwavePayment({
+    paymentUrl = await createFlutterwavePayment({
       txRef: order.payment_reference,
       amount: Number(order.total_ngn),
       email: profile.email,
@@ -45,8 +46,9 @@ export async function GET(request: Request) {
       redirectUrl: `${url.origin}/api/payments/flutterwave/callback`,
     });
 
-    redirect(paymentUrl);
   } catch {
     redirect(`/account/orders?payment=not-configured&order=${encodeURIComponent(order.id)}`);
   }
+
+  redirect(paymentUrl);
 }
