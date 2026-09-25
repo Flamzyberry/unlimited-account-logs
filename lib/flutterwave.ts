@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
 export function getFlutterwaveSecretKey() {
   return process.env.FLW_SECRET_KEY || '';
 }
