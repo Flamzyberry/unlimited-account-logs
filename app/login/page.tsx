@@ -18,7 +18,7 @@ export default function LoginPage() {
     setError('');
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password,
     });
@@ -32,7 +32,7 @@ export default function LoginPage() {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', data.user.id)
+      .eq('id', signInData.user.id)
       .maybeSingle();
 
     if (profile?.role === 'admin') {
