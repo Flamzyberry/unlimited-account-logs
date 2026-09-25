@@ -73,7 +73,7 @@ export default async function CustomerOrders({
             <p>Status: <strong>{order.status}</strong></p>
             {order.status === 'pending' && (
               <a className="btn primary" href={`/api/payments/flutterwave/create?orderId=${encodeURIComponent(order.id)}`}>
-                Pay with Flutterwave
+                Continue to payment
               </a>
             )}
             {order.payment_reference && <p>Payment reference: {order.payment_reference}</p>}
