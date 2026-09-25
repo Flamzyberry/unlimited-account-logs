@@ -23,7 +23,7 @@ export default function LoginPage() {
       password,
     });
 
-    if (signInError) {
+    if (signInError || !signInData.user) {
       setError(signInError.message);
       setLoading(false);
       return;
