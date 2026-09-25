@@ -1,4 +1,66 @@
-import { redirect } from 'next/navigation'; import { createClient } from '@/lib/supabase/server';
-export const dynamic='force-dynamic';
-export default async function CustomerOrders(){const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user)redirect('/login'); const {data:orders}=await supabase.from('orders').select('id,product_name,quantity,total_ngn,status,notes,payment_reference,created_at').eq('customer_id',user.id).order('created_at',{ascending:false});
-return <main className="container" style={{padding:'40px 0'}}><p><a href="/account">← Account</a></p><h1>Order history</h1><div style={{display:'grid',gap:12}}>{orders?.map((o:any)=><div className="card" key={o.id}><h3>{o.product_name}</h3><p>Quantity: {o.quantity} · Total: ₦{Number(o.total_ngn).toLocaleString()}</p><p>Status: <strong>{o.status}</strong></p>{o.payment_reference&&<p>Payment reference: {o.payment_reference}</p>}{o.notes&&<p>Note: {o.notes}</p>}<small>{new Date(o.created_at).toLocaleString()}</small></div>)}{!orders?.length&&<p>No orders yet.</p>}</div></main>;}
+import { redirect } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+
+export const dynamic = 'force-dynamic';
+
+export default async function CustomerOrders({
+  searchParams,
+}: {
+  searchParams: Promise<{ placed?: string }>;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/login');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profile?.role !== 'customer') redirect('/admin/login');
+
+  const { data: orders, error } = await supabase
+    .from('orders')
+    .select('id,product_name,quantity,total_ngn,status,notes,payment_reference,created_at')
+    .eq('customer_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const { placed } = await searchParams;
+
+  return (
+    <main className="container" style={{ padding: '40px 0' }}>
+      <p><a href="/account">← Account</a></p>
+      <h1>Order history</h1>
+
+      {placed === '1' && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          Your order was created successfully and is currently pending payment/processing.
+        </div>
+      )}
+
+      {error && (
+        <div className="notice" style={{ marginBottom: 18 }}>
+          We could not load your orders. Please try again.
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: 12 }}>
+        {orders?.map((order) => (
+          <div className="card" key={order.id}>
+            <h3>{order.product_name}</h3>
+            <p>
+              Quantity: {order.quantity} · Total: ₦{Number(order.total_ngn).toLocaleString()}
+            </p>
+            <p>Status: <strong>{order.status}</strong></p>
+            {order.payment_reference && <p>Payment reference: {order.payment_reference}</p>}
+            {order.notes && <p>Note: {order.notes}</p>}
+            <small>{new Date(order.created_at).toLocaleString()}</small>
+          </div>
+        ))}
+
+        {!orders?.length && <p>No orders yet. <a href="/#products">Browse products</a>.</p>}
+      </div>
+    </main>
+  );
+}
