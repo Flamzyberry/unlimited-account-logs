@@ -22,7 +22,7 @@ export default async function AccountPage() {
           <div className="brand">Customer Account</div>
           <div style={{ color: '#6b7280', fontSize: 14 }}>{profile.email}</div>
         </div>
-        <form action="/auth/signout" method="post">
+        <form action="/auth/signout?next=/login" method="post">
           <button className="btn secondary">Sign out</button>
         </form>
       </div>
