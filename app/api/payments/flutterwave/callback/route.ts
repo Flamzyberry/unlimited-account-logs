@@ -16,6 +16,7 @@ export async function GET(request: Request) {
     redirect('/account/orders?payment=failed');
   }
 
+  let success = false;
   try {
     const transaction = await verifyFlutterwaveTransaction(transactionId);
     const admin = createAdminClient();
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
       transaction.currency !== 'NGN' ||
       Number(transaction.amount) < Number(order.total_ngn)
     ) {
-      redirect('/account/orders?payment=failed');
+      throw new Error('Transaction did not match the order');
     }
 
     const { error } = await admin
@@ -46,10 +47,11 @@ export async function GET(request: Request) {
       .eq('id', order.id)
       .eq('status', 'pending');
 
-    if (error) redirect('/account/orders?payment=failed');
-
-    redirect('/account/orders?payment=success');
+    if (error) throw error;
+    success = true;
   } catch {
-    redirect('/account/orders?payment=failed');
+    success = false;
   }
+
+  redirect(success ? '/account/orders?payment=success' : '/account/orders?payment=failed');
 }
