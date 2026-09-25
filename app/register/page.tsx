@@ -62,8 +62,8 @@ export default function RegisterPage() {
             placeholder="Email" type="email" style={{ padding: 13, border: '1px solid #d1d5db', borderRadius: 10 }} />
           <input aria-label="Phone" value={phone} onChange={e => setPhone(e.target.value)}
             placeholder="Phone number" type="tel" style={{ padding: 13, border: '1px solid #d1d5db', borderRadius: 10 }} />
-          <input aria-label="Password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)}
-            placeholder="Password (minimum 6 characters)" type="password"
+          <input aria-label="Password" required minLength={8} value={password} onChange={e => setPassword(e.target.value)}
+            placeholder="Password (minimum 8 characters)" type="password"
             style={{ padding: 13, border: '1px solid #d1d5db', borderRadius: 10 }} />
           <button className="btn primary" type="submit" disabled={loading}>
             {loading ? 'Creating account…' : 'Create account'}
