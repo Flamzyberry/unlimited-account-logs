@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 export default function SideMenu({admin=false}:{admin?:boolean}){
  const pathname=usePathname();
  const items=admin?[
-  ['/admin','Dashboard'],['/admin/customers','Customers'],['/admin/funding','Funding & Receipts'],['/admin/orders','Orders'],['/admin/products','Products'],['/admin/manual-payment','Manual Payment Account']
+  ['/admin','Dashboard'],['/admin/customers','Customers'],['/admin/funding','Funding & Receipts'],['/admin/orders','Orders'],['/admin/products','Products'],['/admin/manual-payment','Manual Payment Account'],['/admin/site-contact','Site Contact']
  ]:[
   ['/account','Dashboard'],['/account/orders','Orders'],['/account/add-funds','Add Funds'],['/account/funding-history','Funding History'],['/account/profile','Account'],['/account/security','Security']
  ];
