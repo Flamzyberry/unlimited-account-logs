@@ -41,7 +41,7 @@ export default function LoginPage() {
     }
 
     const { data: profile, error: profileError } = await supabase
-      .from('profiles').select('role').eq('id', signInData.user.id).maybeSingle();
+      .from('profiles').select('role,account_status').eq('id', signInData.user.id).maybeSingle();
 
     if (profileError) {
       await supabase.auth.signOut();
@@ -49,7 +49,7 @@ export default function LoginPage() {
       setLoading(false); return;
     }
 
-    if (profile?.role === 'admin') {
+    if (profile?.account_status === 'suspended') { await supabase.auth.signOut(); setError('This customer account is suspended. Please contact support.'); setLoading(false); return; }\n\n    if (profile?.role === 'admin') {
       await supabase.auth.signOut();
       setError('Administrator accounts must use the admin login.');
       setLoading(false); return;
