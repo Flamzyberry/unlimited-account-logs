@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 async function reviewFunding(formData: FormData) {
   'use server';
-  const {status,customer}=await searchParams;\n  const supabase = await createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/admin/login');
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
@@ -37,9 +37,13 @@ export default async function FundingAdmin({searchParams}:{searchParams:Promise<
   const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle();
   if (me?.role !== 'admin') redirect('/admin/login');
 
-  const { data: requests } = await supabase.from('funding_requests')
+  const {status,customer}=await searchParams;
+  let requestQuery = supabase.from('funding_requests')
     .select('id,customer_id,amount_ngn,method,status,payment_reference,receipt_path,customer_note,admin_note,created_at,customer:profiles!funding_requests_customer_id_fkey(full_name,email)')
-    .order('created_at', { ascending: false });\n  if(status && ['pending','approved','rejected'].includes(status)) requestQuery=requestQuery.eq('status',status);\n  if(customer) requestQuery=requestQuery.eq('customer_id',customer);\n  const { data: requests } = await requestQuery;
+    .order('created_at', { ascending: false });
+  if(status && ['pending','approved','rejected'].includes(status)) requestQuery=requestQuery.eq('status',status);
+  if(customer) requestQuery=requestQuery.eq('customer_id',customer);
+  const { data: requests } = await requestQuery;
 
   const admin = createAdminClient();
   const withUrls = await Promise.all((requests || []).map(async (r: any) => {
