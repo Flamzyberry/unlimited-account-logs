@@ -11,7 +11,8 @@ async function placeOrder(formData: FormData) {
   if (!user) redirect('/login');
 
   const productId = String(formData.get('product_id') || '');
-  const quantity = Math.max(1, Math.min(99, Number(formData.get('quantity') || 1)));
+  const rawQuantity = Number(formData.get('quantity') || 1);
+  const quantity = Number.isInteger(rawQuantity) ? Math.max(1, Math.min(99, rawQuantity)) : 1;
   const notes = String(formData.get('notes') || '').trim().slice(0, 500);
 
   if (!productId) redirect('/?error=product');
@@ -33,21 +34,24 @@ async function placeOrder(formData: FormData) {
 
   if (!product) redirect('/?error=unavailable');
 
-  const { error } = await supabase.from('orders').insert({
+  const txRef = `UAL-${crypto.randomUUID()}`;
+
+  const { data: order, error } = await supabase.from('orders').insert({
     customer_id: user.id,
     product_id: product.id,
     product_name: product.name,
     quantity,
     unit_price_ngn: product.price_ngn,
     status: 'pending',
+    payment_reference: txRef,
     notes: notes || null,
-  });
+  }).select('id').single();
 
-  if (error) {
+  if (error || !order) {
     redirect(`/checkout/${product.id}?error=order`);
   }
 
-  redirect('/account/orders?placed=1');
+  redirect(`/api/payments/flutterwave/create?orderId=${encodeURIComponent(order.id)}`);
 }
 
 export default async function CheckoutPage({ params, searchParams }: {
